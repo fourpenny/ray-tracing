@@ -1,6 +1,8 @@
 use std::fs;
 use std::io::{BufWriter, Write};
 
+mod vec;
+
 fn main() {
     
     // Image
