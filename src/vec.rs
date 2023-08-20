@@ -1,27 +1,29 @@
+use std::io::{Write};
+
 #[derive(Clone,Copy)]
-struct Vec3 {
+pub struct Vec3 {
     e: [f64; 3],
 }
 
 impl Vec3 {
     // Instantiation and custom access
-    fn new() -> Vec3 {
+    pub fn new() -> Vec3 {
         Vec3 { e: [0.0, 0.0, 0.0] }
     }
 
-    fn with_values(e0: f64, e1: f64, e2: f64) -> Vec3 {
+    pub fn with_values(e0: f64, e1: f64, e2: f64) -> Vec3 {
         Vec3 { e: [e0, e1, e2] }
     }
 
-    fn x(&self) -> f64 {
+    pub fn x(&self) -> f64 {
         self.e[0]
     }
 
-    fn y(&self) -> f64 {
+    pub fn y(&self) -> f64 {
         self.e[1]
     }
 
-    fn z(&self) -> f64 {
+    pub fn z(&self) -> f64 {
         self.e[2]
     }
     
@@ -33,6 +35,7 @@ impl Vec3 {
     fn length(&self) -> f64 {
         self.length_squared().sqrt()
     }
+
 }
 
 // Basic Operations
@@ -193,10 +196,19 @@ fn cross(u: Vec3, v: Vec3) -> Vec3 {
     }
 }
 
-fn unit_vector(v: Vec3) -> Vec3 {
+pub fn unit_vector(v: Vec3) -> Vec3 {
     v / v.length() 
 }
 
 fn double_dot(u: &Vec3, v: &Vec3) -> f64 {
     u.e[0] * v.e[0] + u.e[1] * v.e[1] + u.e[2] * v.e[2] 
+}
+
+// Writing color to an image from a Vec3 struct
+pub fn write_color(out: &mut dyn Write, pixel_color: Vec3) {
+    let ir = (255.999 * pixel_color.e[0]) as i32;
+    let ig = (255.999 * pixel_color.e[1]) as i32;
+    let ib = (255.999 * pixel_color.e[2]) as i32;
+
+    writeln!(out, "{} {} {}", ir, ig, ib).expect("Failed to write color!");
 }
