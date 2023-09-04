@@ -14,7 +14,7 @@ fn hit_sphere(center: &Vec3, radius: f64, ray: &Ray) -> f64 {
     let c: f64 = oc.length_squared() - (radius * radius);
     let discriminant: f64 = half_b * half_b - a*c;
 
-    if (discriminant < 0.0) {
+    if discriminant < 0.0 {
         return -1.0;
     } else {
         return (-half_b - discriminant.sqrt()) / a;
@@ -24,7 +24,7 @@ fn hit_sphere(center: &Vec3, radius: f64, ray: &Ray) -> f64 {
 fn ray_color(ray: Ray) -> Vec3 {
     // Lerp in order to produce a gradient
     let t: f64 = hit_sphere(&Vec3::with_values(0.0, 0.0, -1.0), 0.5, &ray);
-    if (t > 0.0){
+    if t > 0.0{
         let N: Vec3 = crate::vec::unit_vector(ray.at(t) - Vec3::with_values(0.0, 0.0, -1.0));
         return Vec3::with_values(N.x()+1.0 , N.y() + 1.0, N.z() + 1.0)*0.5;
     }
