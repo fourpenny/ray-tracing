@@ -3,14 +3,18 @@ use std::io::{BufWriter, Write};
 
 use crate::vec::Vec3;
 use crate::ray::Ray;
+use crate::hittable::Hittable;
 
 mod vec;
 mod ray;
+mod hittable;
+mod sphere;
+mod hit_list;
 
 fn hit_sphere(center: &Vec3, radius: f64, ray: &Ray) -> f64 {
     let oc: Vec3 = ray.origin() - *center;
     let a: f64 = ray.direction().length_squared(); 
-    let half_b: f64 = crate::vec::double_dot(&oc, &ray.direction());
+    let half_b: f64 = vec::dot(&oc, &ray.direction());
     let c: f64 = oc.length_squared() - (radius * radius);
     let discriminant: f64 = half_b * half_b - a*c;
 
@@ -21,12 +25,15 @@ fn hit_sphere(center: &Vec3, radius: f64, ray: &Ray) -> f64 {
     }
 }
 
-fn ray_color(ray: Ray) -> Vec3 {
-    // Lerp in order to produce a gradient
-    let t: f64 = hit_sphere(&Vec3::with_values(0.0, 0.0, -1.0), 0.5, &ray);
-    if t > 0.0{
-        let N: Vec3 = crate::vec::unit_vector(ray.at(t) - Vec3::with_values(0.0, 0.0, -1.0));
-        return Vec3::with_values(N.x()+1.0 , N.y() + 1.0, N.z() + 1.0)*0.5;
+fn ray_color(ray: Ray, world: &crate::hit_list::HittableList) -> Vec3 {
+    let rec = crate::hittable::HitRecord{
+        p: Vec3::new(),
+        normal: Vec3::new(),
+        t: 0.0,
+        front_face: false
+    };
+    if world.hit(&ray, 0.0, f64::INFINITY, &rec) {
+        return (rec.normal + Vec3::with_values(1.0, 1.0, 1.0)) * 0.5;
     }
 
     let unit_direction: Vec3 = vec::unit_vector(ray.direction());
@@ -42,6 +49,19 @@ fn main() {
     // Calculate the image height
     let image_height: i16 = (image_width as f64 / aspect_ratio) as i16;
     let image_height: i16 = std::cmp::max(1, image_height);
+
+    // World
+    let mut world = crate::hit_list::HittableList{
+        objects: Vec::<Box<dyn Hittable>>::new()
+    };
+    world.objects.push(Box::new(crate::sphere::Sphere{
+        center: Vec3::with_values(0.0, 0.0, -1.0),
+        radius: 0.5
+    }));
+    world.objects.push(Box::new(crate::sphere::Sphere{
+        center: Vec3::with_values(0.0, -100.5, -1.0),
+        radius: 100.0
+    }));
 
     // Camera
     let focal_length: f64 = 1.0;
@@ -77,7 +97,7 @@ fn main() {
             let ray_direction = pixel_center - camera_center;
             let r: Ray = Ray::new(camera_center, ray_direction);
 
-            let pixel_color: Vec3 = ray_color(r);
+            let pixel_color: Vec3 = ray_color(r, &world);
 
             vec::write_color(&mut f, pixel_color);
             //let data = format!("{} {} {}\n", ir, ig, ib);
