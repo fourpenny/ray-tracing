@@ -26,13 +26,13 @@ fn hit_sphere(center: &Vec3, radius: f64, ray: &Ray) -> f64 {
 }
 
 fn ray_color(ray: Ray, world: &crate::hit_list::HittableList) -> Vec3 {
-    let rec = crate::hittable::HitRecord{
+    let mut rec = crate::hittable::HitRecord{
         p: Vec3::new(),
         normal: Vec3::new(),
         t: 0.0,
         front_face: false
     };
-    if world.hit(&ray, 0.0, f64::INFINITY, &rec) {
+    if world.hit(&ray, 0.0, f64::INFINITY, &mut rec) {
         return (rec.normal + Vec3::with_values(1.0, 1.0, 1.0)) * 0.5;
     }
 
@@ -54,14 +54,8 @@ fn main() {
     let mut world = crate::hit_list::HittableList{
         objects: Vec::<Box<dyn Hittable>>::new()
     };
-    world.objects.push(Box::new(crate::sphere::Sphere{
-        center: Vec3::with_values(0.0, 0.0, -1.0),
-        radius: 0.5
-    }));
-    world.objects.push(Box::new(crate::sphere::Sphere{
-        center: Vec3::with_values(0.0, -100.5, -1.0),
-        radius: 100.0
-    }));
+    world.objects.push(Box::new(crate::sphere::Sphere::with_values(Vec3::with_values(0.0, 0.0, -1.0), 0.5)));
+    world.objects.push(Box::new(crate::sphere::Sphere::with_values(Vec3::with_values(0.0, -100.5, -1.0),100.0)));
 
     // Camera
     let focal_length: f64 = 1.0;

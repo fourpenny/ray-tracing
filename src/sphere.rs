@@ -1,17 +1,34 @@
 use crate::vec::Vec3;
 use crate::ray::Ray;
 use crate::hittable::HitRecord;
+use crate::hittable::Hittable;
 
 pub struct Sphere {
     center: Vec3,
     radius: f64
 }
 
-impl crate::hittable::Hittable for Sphere {
+impl Sphere {
+    pub fn new() -> Sphere {
+        Sphere {
+            center: Vec3::new(),
+            radius: 0.0
+        }
+    }
+
+    pub fn with_values(c: Vec3, r: f64) -> Sphere {
+        Sphere {
+            center: c,
+            radius: r
+        }
+    }
+}
+
+impl Hittable for Sphere {
     // Modifies a Hit_Record struct containing information
     // the intersecting ray and its surface normals when
     // the sphere is hit.
-    fn hit(&self, r: &Ray, ray_tmin: f64, ray_tmax: f64, rec: &HitRecord) -> bool {
+    fn hit(&self, r: &Ray, ray_tmin: f64, ray_tmax: f64, rec: &mut HitRecord) -> bool {
         // We determine whether or not the ray intersects
         // the surface of the sphere using the quadratic
         // formula.
@@ -34,8 +51,8 @@ impl crate::hittable::Hittable for Sphere {
         // details about the intersecting ray and normal
         rec.t = root;
         rec.p = r.at(rec.t);
-        let outward_normal: Vec3 = (rec.p - self.center) / self.radius;
-        crate::hittable::set_face_normal(&r, &*rec);
+        rec.normal = (rec.p - self.center) / self.radius;
+        crate::hittable::set_face_normal(&r, &mut *rec);
 
         return true;
     }

@@ -1,6 +1,6 @@
 use std::io::{Write};
 
-#[derive(Clone,Copy)]
+#[derive(Clone,Copy,Debug)]
 pub struct Vec3 {
     e: [f64; 3],
 }

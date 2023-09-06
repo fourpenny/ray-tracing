@@ -1,19 +1,19 @@
 use crate::ray::Ray;
 use crate::vec::Vec3;
 
-#[derive (Copy, Clone)]
+#[derive (Copy, Clone,Debug)]
 pub struct HitRecord {
     pub p: Vec3,
     pub normal: Vec3,
     pub t: f64,
-    front_face: bool
+    pub front_face: bool
 }
 
 pub trait Hittable {
-    fn hit(&self, r: &Ray, ray_tmin: f64, ray_tmax: f64, mut rec: &HitRecord) -> bool;
+    fn hit(&self, r: &Ray, ray_tmin: f64, ray_tmax: f64, rec: &mut HitRecord) -> bool;
 }
 
-pub fn set_face_normal(r: &Ray, hr: &HitRecord){
+pub fn set_face_normal(r: &Ray, hr: &mut HitRecord){
     // Sets a hit record normal vector so it points
     // out of the surface of the object
     // NOTE: we assume `outward_normal` has unit length.
