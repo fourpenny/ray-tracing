@@ -20,7 +20,7 @@ impl Hittable for HittableList {
         let mut closest_so_far: f64 = ray_tmax.clone();
 
         for obj in self.objects.iter() {
-            let obj_hit: bool = obj.hit(r, ray_tmin, ray_tmax, &mut temp_rec);
+            let obj_hit: bool = obj.hit(r, ray_tmin, closest_so_far, &mut temp_rec);
             if obj_hit {
                 hit_anything = true;
                 closest_so_far = temp_rec.t;

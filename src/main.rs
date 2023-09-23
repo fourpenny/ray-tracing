@@ -22,6 +22,7 @@ fn hit_sphere(center: &Vec3, radius: f64, ray: &Ray) -> f64 {
         return -1.0;
     } else {
         return (-half_b - discriminant.sqrt()) / a;
+        //return (-b - discriminant.sqrt() ) / (2.0*a);
     }
 }
 
@@ -54,9 +55,10 @@ fn main() {
     let mut world = crate::hit_list::HittableList{
         objects: Vec::<Box<dyn Hittable>>::new()
     };
-    world.objects.push(Box::new(crate::sphere::Sphere::with_values(Vec3::with_values(0.0, 0.0, -1.0), 0.5)));
-    world.objects.push(Box::new(crate::sphere::Sphere::with_values(Vec3::with_values(0.0, -100.5, -1.0),100.0)));
 
+    world.objects.push(Box::new(crate::sphere::Sphere::with_values(Vec3::with_values(0.0, -50.5, -1.0), 50.0)));
+    world.objects.push(Box::new(crate::sphere::Sphere::with_values(Vec3::with_values(0.0, 0.0, -1.0), 0.5)));
+    
     // Camera
     let focal_length: f64 = 1.0;
     let viewport_height: f64 = 2.0;

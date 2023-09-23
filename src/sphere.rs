@@ -2,6 +2,7 @@ use crate::vec::Vec3;
 use crate::ray::Ray;
 use crate::hittable::HitRecord;
 use crate::hittable::Hittable;
+use std::io::Write;
 
 pub struct Sphere {
     center: Vec3,
@@ -45,7 +46,13 @@ impl Hittable for Sphere {
         let sqrtd: f64 = discriminant.sqrt();
 
         // Find nearest root in the acceptable range
-        let root: f64 = (-half_b - sqrtd) / a;
+        let mut root: f64 = (-half_b - sqrtd) / a;
+        if root <= ray_tmin || ray_tmax <= root {
+            root = (-half_b + sqrtd) / a;
+            if root <= ray_tmin || ray_tmax <= root {
+                return false;
+            }       
+        }
 
         // Modify the hit record to include
         // details about the intersecting ray and normal
