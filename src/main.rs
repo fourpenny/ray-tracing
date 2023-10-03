@@ -1,8 +1,10 @@
 use std::fs;
-use std::io::{BufWriter, Write};
+use std::io::BufWriter;
 
 use crate::vec::Vec3;
 use crate::ray::Ray;
+use crate::interval::Interval;
+use crate::camera::Camera;
 use crate::hittable::Hittable;
 
 mod vec;
@@ -10,6 +12,8 @@ mod ray;
 mod hittable;
 mod sphere;
 mod hit_list;
+mod interval;
+mod camera;
 
 fn hit_sphere(center: &Vec3, radius: f64, ray: &Ray) -> f64 {
     let oc: Vec3 = ray.origin() - *center;
@@ -28,12 +32,12 @@ fn hit_sphere(center: &Vec3, radius: f64, ray: &Ray) -> f64 {
 
 fn ray_color(ray: Ray, world: &crate::hit_list::HittableList) -> Vec3 {
     let mut rec = crate::hittable::HitRecord{
-        p: Vec3::new(),
-        normal: Vec3::new(),
+        p: Vec3::default(),
+        normal: Vec3::default(),
         t: 0.0,
         front_face: false
     };
-    if world.hit(&ray, 0.0, f64::INFINITY, &mut rec) {
+    if world.hit(&ray, Interval::new(0.0, f64::INFINITY), &mut rec) {
         return (rec.normal + Vec3::with_values(1.0, 1.0, 1.0)) * 0.5;
     }
 
@@ -48,22 +52,24 @@ fn main() {
     let image_width: i16 = 400;
 
     // Calculate the image height
-    let image_height: i16 = (image_width as f64 / aspect_ratio) as i16;
-    let image_height: i16 = std::cmp::max(1, image_height);
+    /* let image_height: i16 = (image_width as f64 / aspect_ratio) as i16;
+    let image_height: i16 = std::cmp::max(1, image_height); */
 
     // World
     let mut world = crate::hit_list::HittableList{
-        objects: Vec::<Box<dyn Hittable>>::new()
+        objects: Vec::<Box<dyn crate::hittable::Hittable>>::new()
     };
 
     world.objects.push(Box::new(crate::sphere::Sphere::with_values(Vec3::with_values(0.0, -50.5, -1.0), 50.0)));
     world.objects.push(Box::new(crate::sphere::Sphere::with_values(Vec3::with_values(0.0, 0.0, -1.0), 0.5)));
     
     // Camera
-    let focal_length: f64 = 1.0;
+    let camera: Camera = Camera::new(image_width, aspect_ratio);
+
+    /* let focal_length: f64 = 1.0;
     let viewport_height: f64 = 2.0;
     let viewport_width: f64 = viewport_height * (image_width as f64 /image_height as f64);
-    let camera_center: Vec3 = Vec3::new();
+    let camera_center: Vec3 = Vec3::default();
 
     // Calculate the vectors across the horizontal and down the vertical viewport edges.
     let viewport_u: Vec3 = Vec3::with_values(viewport_width, 0.0, 0.0);
@@ -79,12 +85,13 @@ fn main() {
     let viewport_upper_left: Vec3 = camera_center 
         - Vec3::with_values(0.0, 0.0, focal_length) - viewport_u/2 - viewport_v/2;
     // Get the actual center of the pixel at (0, 0) - the upper left hand corner.
-    let pixel00_loc: Vec3 = viewport_upper_left + ((pixel_delta_u + pixel_delta_v) * 0.5);
+    let pixel00_loc: Vec3 = viewport_upper_left + ((pixel_delta_u + pixel_delta_v) * 0.5); */
 
     // Render 
     let f = fs::File::create("./image.ppm").expect("Unable to create file");
     let mut f = BufWriter::new(f);
-    let data = format!("P3\n{} {} \n255\n", image_width, image_height);
+    camera.render(&world, &mut f);
+    /* let data = format!("P3\n{} {} \n255\n", image_width, image_height);
     f.write_all(data.as_bytes()).expect("Unable to write to file");
     for j in 0..image_height {
         println!("Scanlines remaining: {}", (image_height-j));
@@ -100,5 +107,5 @@ fn main() {
             //f.write_all(data.as_bytes()).expect("Unable to write to file");
         }
     }
-    println!("Done!");
+    println!("Done!"); */
 }

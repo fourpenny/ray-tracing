@@ -7,10 +7,6 @@ pub struct Vec3 {
 
 impl Vec3 {
     // Instantiation and custom access
-    pub fn new() -> Vec3 {
-        Vec3 { e: [0.0, 0.0, 0.0] }
-    }
-
     pub fn with_values(e0: f64, e1: f64, e2: f64) -> Vec3 {
         Vec3 { e: [e0, e1, e2] }
     }
@@ -36,6 +32,12 @@ impl Vec3 {
         self.length_squared().sqrt()
     }
 
+}
+
+impl Default for Vec3 {
+    fn default() -> Self {
+        Vec3 { e: [0.0, 0.0, 0.0] }
+    }
 }
 
 // Basic Operations

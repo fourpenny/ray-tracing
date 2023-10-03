@@ -2,7 +2,7 @@ use crate::vec::Vec3;
 use crate::ray::Ray;
 use crate::hittable::HitRecord;
 use crate::hittable::Hittable;
-use std::io::Write;
+use crate::interval::Interval;
 
 pub struct Sphere {
     center: Vec3,
@@ -12,7 +12,7 @@ pub struct Sphere {
 impl Sphere {
     pub fn new() -> Sphere {
         Sphere {
-            center: Vec3::new(),
+            center: Vec3::default(),
             radius: 0.0
         }
     }
@@ -29,7 +29,7 @@ impl Hittable for Sphere {
     // Modifies a Hit_Record struct containing information
     // the intersecting ray and its surface normals when
     // the sphere is hit.
-    fn hit(&self, r: &Ray, ray_tmin: f64, ray_tmax: f64, rec: &mut HitRecord) -> bool {
+    fn hit(&self, r: &Ray, ray_t: Interval, rec: &mut HitRecord) -> bool {
         // We determine whether or not the ray intersects
         // the surface of the sphere using the quadratic
         // formula.
@@ -47,9 +47,9 @@ impl Hittable for Sphere {
 
         // Find nearest root in the acceptable range
         let mut root: f64 = (-half_b - sqrtd) / a;
-        if root <= ray_tmin || ray_tmax <= root {
+        if !ray_t.surrounds(root) {
             root = (-half_b + sqrtd) / a;
-            if root <= ray_tmin || ray_tmax <= root {
+            if !ray_t.surrounds(root) {
                 return false;
             }       
         }
