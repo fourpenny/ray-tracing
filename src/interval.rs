@@ -27,6 +27,10 @@ impl Interval {
     pub fn min(&self) -> f64 {
         self.min
     }
+
+    pub fn clamp(&self, x: f64) -> f64 {
+        x.clamp(self.min, self.max)
+    }
 }
 
 const EMPTY: Interval = Interval::new_constant(f64::INFINITY, -f64::INFINITY);

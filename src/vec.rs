@@ -1,4 +1,5 @@
 use std::io::{Write};
+use crate::interval::Interval;
 
 #[derive(Clone,Copy,Debug)]
 pub struct Vec3 {
@@ -207,10 +208,20 @@ pub fn dot(u: &Vec3, v: &Vec3) -> f64 {
 }
 
 // Writing color to an image from a Vec3 struct
-pub fn write_color(out: &mut dyn Write, pixel_color: Vec3) {
-    let ir = (255.999 * pixel_color.e[0]) as i32;
-    let ig = (255.999 * pixel_color.e[1]) as i32;
-    let ib = (255.999 * pixel_color.e[2]) as i32;
+pub fn write_color(out: &mut dyn Write, pixel_color: Vec3, samples_per_pixel: i16) {
+    let mut r = pixel_color.x();
+    let mut g = pixel_color.y();
+    let mut b = pixel_color.z();
 
+    // Divide each color channel by the number of samples
+    let scale: f64 = 1.0 / samples_per_pixel as f64;
+    r *= scale;
+    g *= scale;
+    b *= scale;
+
+    let intensity = Interval::new(0.0, 0.999);
+    let ir = (256.0 * intensity.clamp(r)) as i16;
+    let ig = (256.0 * intensity.clamp(g)) as i16;
+    let ib = (256.0 * intensity.clamp(b)) as i16;
     writeln!(out, "{} {} {}", ir, ig, ib).expect("Failed to write color!");
 }

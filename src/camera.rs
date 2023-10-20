@@ -2,23 +2,25 @@ use crate::vec::Vec3;
 use crate::ray::Ray;
 use crate::interval::Interval;
 use crate::hittable::Hittable;
+use crate::utility::random_double;
 use std::io::Write;
 
 pub struct Camera {
+    pub samples_per_pixel: i16, // Count of random samples for each pixel
     pub aspect_ratio: f64, // Ratio of image width to height
-    pub image_width: i16, // Rendered image width in pixels
-    image_height: i16,
+    pub image_width: i32, // Rendered image width in pixels
+    image_height: i32,
     center: Vec3,
     pixel00_loc: Vec3,
     pixel_delta_u: Vec3,
-    pixel_delta_v: Vec3
+    pixel_delta_v: Vec3,
 }
 
 impl Camera {
-    pub fn new(image_width: i16, aspect_ratio: f64) -> Self {
+    pub fn new(samples_per_pixel: i16, aspect_ratio: f64, image_width: i32) -> Self {
         // Get image dimensions
-        let image_height: i16 = (image_width as f64 / aspect_ratio) as i16;
-        let image_height: i16 = std::cmp::max(1, image_height);
+        let image_height: i32 = (image_width as f64 / aspect_ratio) as i32;
+        let image_height: i32 = std::cmp::max(1, image_height);
 
         // Calculate viewport dimensions
         let focal_length: f64 = 1.0;
@@ -41,6 +43,7 @@ impl Camera {
         let pixel00_loc: Vec3 = viewport_upper_left + ((pixel_delta_u + pixel_delta_v) * 0.5);
         
         return Camera {
+            samples_per_pixel: samples_per_pixel,
             aspect_ratio: aspect_ratio,
             image_width: image_width,
             image_height: image_height,
@@ -63,16 +66,33 @@ impl Camera {
         for j in 0..self.image_height {
             println!("Scanlines remaining: {}", (self.image_height-j));
             for i in 0..self.image_width {
-                let pixel_center = self.pixel00_loc + (self.pixel_delta_u * i) + (self.pixel_delta_v * j);
-                let ray_direction = pixel_center - self.center;
-                let r: Ray = Ray::new(self.center, ray_direction);
-    
-                let pixel_color: Vec3 = ray_color(r, world);
-    
-                crate::vec::write_color(&mut output, pixel_color);
+                let mut pixel_color = Vec3::default();
+                for sample in 0..self.samples_per_pixel {
+                    let r: Ray = self.get_ray(i, j);
+                    pixel_color = pixel_color + ray_color(r, world);
+                }
+                crate::vec::write_color(&mut output, pixel_color, self.samples_per_pixel);
             }
         }
         println!("Done!");
+    }
+
+    fn get_ray(&self, i: i32, j: i32) -> Ray{
+        // Get a randomly sampled point within the pixel at location (i, j)
+        let pixel_center: Vec3 = 
+            self.pixel00_loc + (self.pixel_delta_u * i) + (self.pixel_delta_v * j);
+        let pixel_sample: Vec3 = pixel_center + self.sample_within_pixel();
+
+        let ray_origin: Vec3 = self.center;
+        let ray_direction: Vec3 = pixel_sample - ray_origin;
+
+        return Ray::new(ray_origin, ray_direction);
+    }
+
+    fn sample_within_pixel(&self) -> Vec3 {
+        let px: f64 = -0.5 + random_double();
+        let py: f64 = -0.5 + random_double();
+        (self.pixel_delta_u * px) + (self.pixel_delta_v * py)
     }
 }
 
