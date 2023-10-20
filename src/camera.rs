@@ -104,7 +104,8 @@ pub fn ray_color(ray: Ray, world: &crate::hit_list::HittableList) -> Vec3 {
         front_face: false
     };
     if world.hit(&ray, Interval::new(0.0, f64::INFINITY), &mut rec) {
-        return (rec.normal + Vec3::with_values(1.0, 1.0, 1.0)) * 0.5;
+        let direction: Vec3 = crate::vec::random_on_hemisphere(rec.normal);
+        return ray_color(Ray::new(rec.p, direction), world) * 0.5;
     }
 
     let unit_direction: Vec3 = crate::vec::unit_vector(ray.direction());

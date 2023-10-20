@@ -25,7 +25,6 @@ fn hit_sphere(center: &Vec3, radius: f64, ray: &Ray) -> f64 {
         return -1.0;
     } else {
         return (-half_b - discriminant.sqrt()) / a;
-        //return (-b - discriminant.sqrt() ) / (2.0*a);
     }
 }
 

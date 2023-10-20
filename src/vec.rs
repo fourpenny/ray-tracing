@@ -1,5 +1,6 @@
 use std::io::{Write};
 use crate::interval::Interval;
+use crate::utility::{random_double, random_double_in_range};
 
 #[derive(Clone,Copy,Debug)]
 pub struct Vec3 {
@@ -33,6 +34,29 @@ impl Vec3 {
         self.length_squared().sqrt()
     }
 
+    pub fn random() -> Vec3 {
+        Vec3 {e: [random_double(), random_double(), random_double()] }
+    }
+
+    pub fn random_with_range(min: f64, max: f64) -> Vec3 {
+        Vec3 {e: [
+            random_double_in_range(min, max),
+            random_double_in_range(min, max),
+            random_double_in_range(min, max)]}
+    }
+
+    pub fn random_in_unit_sphere() -> Vec3 {
+        loop {
+            let p: Vec3 = Vec3::random_with_range(-1.0, 1.0);
+            if p.length_squared() < 1.0 {
+                return p;
+            }
+        }
+    }
+
+    pub fn random_unit_vector() -> Vec3 {
+        unit_vector(Vec3::random_in_unit_sphere())
+    }
 }
 
 impl Default for Vec3 {
@@ -205,6 +229,15 @@ pub fn unit_vector(v: Vec3) -> Vec3 {
 
 pub fn dot(u: &Vec3, v: &Vec3) -> f64 {
     u.e[0] * v.e[0] + u.e[1] * v.e[1] + u.e[2] * v.e[2] 
+}
+
+pub fn random_on_hemisphere(normal: Vec3) -> Vec3 {
+    let on_unit_sphere: Vec3 = Vec3::random_unit_vector();
+    if dot(&on_unit_sphere, &normal) > 0.0 {
+        return on_unit_sphere;
+    } else {
+        return on_unit_sphere * -1;
+    }
 }
 
 // Writing color to an image from a Vec3 struct
