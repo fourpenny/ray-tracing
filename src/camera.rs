@@ -113,7 +113,7 @@ pub fn ray_color(ray: Ray, world: &crate::hit_list::HittableList, mut depth: i16
     
     // Use value slightly above 0 to avoid issues with FP precision
     if world.hit(&ray, Interval::new(0.001, f64::INFINITY), &mut rec) {
-        let direction: Vec3 = crate::vec::random_on_hemisphere(rec.normal);
+        let direction: Vec3 = rec.normal + Vec3::random_unit_vector();
         return ray_color(Ray::new(rec.p, direction), world, depth-1) * 0.5;
     }
 
