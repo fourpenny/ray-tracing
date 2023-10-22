@@ -33,6 +33,7 @@ fn main() {
     let aspect_ratio: f64 = 16.0 / 9.0;
     let image_width: i32 = 400;
     let samples_per_pixel: i16 = 100;
+    let max_depth: i16 = 10;
 
     // World
     let mut world = crate::hit_list::HittableList{
@@ -43,7 +44,7 @@ fn main() {
     world.objects.push(Box::new(crate::sphere::Sphere::with_values(Vec3::with_values(0.0, 0.0, -1.0), 0.5)));
     
     // Camera
-    let camera: Camera = Camera::new(samples_per_pixel, aspect_ratio, image_width);
+    let camera: Camera = Camera::new(samples_per_pixel, aspect_ratio, image_width, max_depth);
 
     // Render 
     let f = fs::File::create("./image.ppm").expect("Unable to create file");

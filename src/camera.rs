@@ -14,10 +14,11 @@ pub struct Camera {
     pixel00_loc: Vec3,
     pixel_delta_u: Vec3,
     pixel_delta_v: Vec3,
+    max_depth: i16,
 }
 
 impl Camera {
-    pub fn new(samples_per_pixel: i16, aspect_ratio: f64, image_width: i32) -> Self {
+    pub fn new(samples_per_pixel: i16, aspect_ratio: f64, image_width: i32, max_depth: i16) -> Self {
         // Get image dimensions
         let image_height: i32 = (image_width as f64 / aspect_ratio) as i32;
         let image_height: i32 = std::cmp::max(1, image_height);
@@ -50,7 +51,8 @@ impl Camera {
             center: camera_center,
             pixel00_loc: pixel00_loc,
             pixel_delta_u: pixel_delta_u,
-            pixel_delta_v: pixel_delta_v
+            pixel_delta_v: pixel_delta_v,
+            max_depth: max_depth
         };
     }
 
@@ -69,7 +71,7 @@ impl Camera {
                 let mut pixel_color = Vec3::default();
                 for sample in 0..self.samples_per_pixel {
                     let r: Ray = self.get_ray(i, j);
-                    pixel_color = pixel_color + ray_color(r, world);
+                    pixel_color = pixel_color + ray_color(r, world, self.max_depth.clone());
                 }
                 crate::vec::write_color(&mut output, pixel_color, self.samples_per_pixel);
             }
@@ -96,16 +98,23 @@ impl Camera {
     }
 }
 
-pub fn ray_color(ray: Ray, world: &crate::hit_list::HittableList) -> Vec3 {
+pub fn ray_color(ray: Ray, world: &crate::hit_list::HittableList, mut depth: i16) -> Vec3 {
     let mut rec = crate::hittable::HitRecord{
         p: Vec3::default(),
         normal: Vec3::default(),
         t: 0.0,
         front_face: false
     };
-    if world.hit(&ray, Interval::new(0.0, f64::INFINITY), &mut rec) {
+
+    // If we hit the bounce limit, no more light is gained
+    if depth <= 0 {
+        return Vec3::default();
+    }
+    
+    // Use value slightly above 0 to avoid issues with FP precision
+    if world.hit(&ray, Interval::new(0.001, f64::INFINITY), &mut rec) {
         let direction: Vec3 = crate::vec::random_on_hemisphere(rec.normal);
-        return ray_color(Ray::new(rec.p, direction), world) * 0.5;
+        return ray_color(Ray::new(rec.p, direction), world, depth-1) * 0.5;
     }
 
     let unit_direction: Vec3 = crate::vec::unit_vector(ray.direction());
