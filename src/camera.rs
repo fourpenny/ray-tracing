@@ -3,6 +3,7 @@ use crate::ray::Ray;
 use crate::interval::Interval;
 use crate::hittable::Hittable;
 use crate::utility::random_double;
+use crate::material::Lambertian;
 use std::io::Write;
 
 pub struct Camera {
@@ -103,7 +104,8 @@ pub fn ray_color(ray: Ray, world: &crate::hit_list::HittableList, mut depth: i16
         p: Vec3::default(),
         normal: Vec3::default(),
         t: 0.0,
-        front_face: false
+        front_face: false,
+        material: Box::new(Lambertian::new(Vec3::default()))
     };
 
     // If we hit the bounce limit, no more light is gained

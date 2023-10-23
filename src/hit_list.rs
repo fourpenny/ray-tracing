@@ -3,6 +3,7 @@ use crate::hittable::HitRecord;
 use crate::ray::Ray;
 use crate::vec::Vec3;
 use crate::interval::Interval;
+use crate::material::Lambertian;
 
 pub struct HittableList {
     pub objects: Vec<Box<dyn Hittable>>,
@@ -15,7 +16,8 @@ impl Hittable for HittableList {
             p: Vec3::default(),
             normal: Vec3::default(),
             t: 0.0,
-            front_face: false
+            front_face: false,
+            material: Box::new(Lambertian::new(Vec3::default()))
         }; 
         let mut hit_anything: bool = false;
         let mut closest_so_far: f64 = ray_t.max();

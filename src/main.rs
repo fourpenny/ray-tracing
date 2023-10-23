@@ -5,6 +5,7 @@ use crate::vec::Vec3;
 use crate::ray::Ray;
 use crate::camera::Camera;
 
+
 mod vec;
 mod ray;
 mod hittable;
@@ -13,6 +14,7 @@ mod hit_list;
 mod interval;
 mod camera;
 mod utility;
+mod material;
 
 fn hit_sphere(center: &Vec3, radius: f64, ray: &Ray) -> f64 {
     let oc: Vec3 = ray.origin() - *center;
@@ -40,8 +42,8 @@ fn main() {
         objects: Vec::<Box<dyn crate::hittable::Hittable>>::new()
     };
 
-    world.objects.push(Box::new(crate::sphere::Sphere::with_values(Vec3::with_values(0.0, -50.5, -1.0), 50.0)));
-    world.objects.push(Box::new(crate::sphere::Sphere::with_values(Vec3::with_values(0.0, 0.0, -1.0), 0.5)));
+    // world.objects.push(Box::new(crate::sphere::Sphere::with_values(Vec3::with_values(0.0, -50.5, -1.0),50.0)));
+    // world.objects.push(Box::new(crate::sphere::Sphere::with_values(Vec3::with_values(0.0, 0.0, -1.0), 0.5)));
     
     // Camera
     let camera: Camera = Camera::new(samples_per_pixel, aspect_ratio, image_width, max_depth);

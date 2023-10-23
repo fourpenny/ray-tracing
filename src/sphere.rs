@@ -3,24 +3,28 @@ use crate::ray::Ray;
 use crate::hittable::HitRecord;
 use crate::hittable::Hittable;
 use crate::interval::Interval;
+use crate::material::{Material,Lambertian};
 
 pub struct Sphere {
     center: Vec3,
-    radius: f64
+    radius: f64,
+    mat: Box<dyn Material>,
 }
 
 impl Sphere {
     pub fn new() -> Sphere {
         Sphere {
             center: Vec3::default(),
-            radius: 0.0
+            radius: 0.0,
+            mat: Box::new(Lambertian::new(Vec3::default()))
         }
     }
 
-    pub fn with_values(c: Vec3, r: f64) -> Sphere {
+    pub fn with_values(c: Vec3, r: f64, mat: Box<dyn Material>) -> Sphere {
         Sphere {
             center: c,
-            radius: r
+            radius: r,
+            mat: mat
         }
     }
 }
