@@ -3,7 +3,7 @@ use crate::hittable::HitRecord;
 use crate::vec::Vec3;
 
 pub trait Material {
-    fn scatter(&self, ray: Ray, hit_record: HitRecord, attenuation: &Vec3, scattered: &Ray) -> bool;
+    fn scatter(&self, ray: Ray, hit_record: HitRecord, attenuation: &mut Vec3, scattered: &mut Ray) -> bool;
 }
 
 #[derive (Copy, Clone, Debug)]
@@ -20,7 +20,7 @@ impl Lambertian {
 }
 
 impl Material for Lambertian {
-    fn scatter(&self, ray: Ray, hit_record: HitRecord, mut attenuation: &Vec3, mut scattered: &Ray) -> bool{
+    fn scatter(&self, ray: Ray, hit_record: HitRecord, mut attenuation: &mut Vec3, mut scattered: &mut Ray) -> bool{
         let mut scatter_direction: Vec3 = hit_record.normal + Vec3::random_unit_vector();
         
         if scatter_direction.close_to_zero() {
@@ -28,7 +28,7 @@ impl Material for Lambertian {
         }
 
         *scattered = Ray::new(hit_record.p, scatter_direction);
-        attenuation = &self.albedo;
+        *attenuation = self.albedo.clone();
         return true;
     }
 }

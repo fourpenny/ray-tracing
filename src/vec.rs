@@ -247,8 +247,8 @@ pub fn random_on_hemisphere(normal: Vec3) -> Vec3 {
 
 // Reflect an incoming ray across the surface, using its normal
 // The normal is assumed to be of unit length.
-pub fn reflect(v: &Vec3, n: &Vec3) {
-    return v - n * 2.0 * dot(&v, &n);
+pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
+    return *v - *n * 2.0 * dot(&v, &n);
 }
 
 // Writing color to an image from a Vec3 struct
